@@ -18,6 +18,7 @@ from deap import base
 from deap import creator
 from deap import tools
 from deap import gp
+import pygraphviz as pgv
 #from sympy import *
 
 #from util.excelUtil import ExcelUtil
@@ -575,6 +576,7 @@ def gpSimple(population, toolbox, cxpb, mutpb, ngen, stats=None,
         print(logbook.stream)
 
     # 打印最优个体
+
     print(halloffame.items[0])
     print(halloffame.keys[0]) #这是中间某一代最好的，不一定是最后一代中最好的。
     #第0代中最优个体在testing中的表现
@@ -595,6 +597,20 @@ def gpSimple(population, toolbox, cxpb, mutpb, ngen, stats=None,
     for gen in range(1, ngen + 1):
         # Select the next generation individuals
         offspring = toolbox.select(population, len(population))
+        expr = toolbox.individual()
+        nodes, edges, labels = gp.graph(expr)
+
+        g = pgv.AGraph()
+        g.add_nodes_from(nodes)
+        g.add_edges_from(edges)
+        g.layout(prog="dot")
+
+        for i in nodes:
+            n = g.get_node(i)
+            n.attr["label"] = labels[i]
+
+        name = './pic/tree' + str(gen) + '.pdf'
+        g.draw(name)
 
         # Vary the pool of individuals
         offspring = algorithms.varAnd(offspring, toolbox, cxpb, mutpb)
