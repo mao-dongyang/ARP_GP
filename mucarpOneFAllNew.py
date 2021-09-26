@@ -597,20 +597,6 @@ def gpSimple(population, toolbox, cxpb, mutpb, ngen, stats=None,
     for gen in range(1, ngen + 1):
         # Select the next generation individuals
         offspring = toolbox.select(population, len(population))
-        expr = toolbox.individual()
-        nodes, edges, labels = gp.graph(expr)
-
-        g = pgv.AGraph()
-        g.add_nodes_from(nodes)
-        g.add_edges_from(edges)
-        g.layout(prog="dot")
-
-        for i in nodes:
-            n = g.get_node(i)
-            n.attr["label"] = labels[i]
-
-        name = './pic/tree' + str(gen) + '.pdf'
-        g.draw(name)
 
         # Vary the pool of individuals
         offspring = algorithms.varAnd(offspring, toolbox, cxpb, mutpb)
@@ -639,6 +625,21 @@ def gpSimple(population, toolbox, cxpb, mutpb, ngen, stats=None,
         print(halloffame.items[0])
         print(halloffame.keys[0])
 
+        expr = halloffame.items[0]
+        nodes, edges, labels = gp.graph(expr)
+
+        g = pgv.AGraph()
+        g.add_nodes_from(nodes)
+        g.add_edges_from(edges)
+        g.layout(prog="dot")
+
+        for i in nodes:
+            n = g.get_node(i)
+            n.attr["label"] = labels[i]
+
+        name = './pic/tree' + str(gen) + '.pdf'
+        g.draw(name)
+        
         endtime = datetime.datetime.now()
         time = endtime - starttime
         print(time)
@@ -692,5 +693,5 @@ def main():
     return pop, log, hof
 
 if __name__ == "__main__":
-    for run in range(20):
+    for run in range(1):
         main()
