@@ -637,9 +637,12 @@ def gpSimple(population, toolbox, cxpb, mutpb, ngen, stats=None,
             n = g.get_node(i)
             n.attr["label"] = labels[i]
 
-        name = './pic/tree' + str(gen) + '.pdf'
+        keystrlist = str(halloffame.keys[0]).split(',')
+        key2show = keystrlist[0][1:7]
+
+        name = './pic/' + str(gen) + 'tree' + key2show + '.pdf'
         g.draw(name)
-        
+
         endtime = datetime.datetime.now()
         time = endtime - starttime
         print(time)
