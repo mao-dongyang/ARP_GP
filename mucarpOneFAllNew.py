@@ -9,7 +9,9 @@
 import operator
 import math
 import random
+import os
 
+import dataProcess
 import numpy
 import copy
 import datetime
@@ -51,7 +53,7 @@ def max(left, right):
         return right
 
 def min(left, right):
-    if left <=right:
+    if left <= right:
         return left
     else:
         return right
@@ -484,7 +486,7 @@ toolbox.register("mutate", gp.mutUniform, expr=toolbox.expr_mut, pset=pset)
 toolbox.decorate("mate", gp.staticLimit(key=operator.attrgetter("height"), max_value=8))
 toolbox.decorate("mutate", gp.staticLimit(key=operator.attrgetter("height"), max_value=8))
 
-def gpSimple(population, toolbox, cxpb, mutpb, ngen, stats=None,
+def gpSimple(population, toolbox, cxpb, mutpb, ngen, where, stats=None,
              halloffame=None, verbose=__debug__):
     """This algorithm reproduce the simplest evolutionary algorithm as
     presented in chapter 7 of [Back2000]_.
@@ -640,12 +642,14 @@ def gpSimple(population, toolbox, cxpb, mutpb, ngen, stats=None,
         keystrlist = str(halloffame.keys[0]).split(',')
         key2show = keystrlist[0][1:7]
 
-        name = './pic/' + str(gen) + 'tree' + key2show + '.pdf'
+        name = where + str(gen) + 'tree' + key2show + '.pdf'
         g.draw(name)
 
         endtime = datetime.datetime.now()
         time = endtime - starttime
         print(time)
+
+        dataProcess.csvGenerator(gen, key2show, where + 'gen2key.csv')
 
         aStr = '%s' % logbook.stream
         bStr = '%s' % halloffame.items[0]
@@ -662,7 +666,10 @@ def gpSimple(population, toolbox, cxpb, mutpb, ngen, stats=None,
     # excelUtil.saveWbObjToExcel(excelWb)
     return population, logbook
 
-def main():
+def main(run):
+    dataDir = './output/data' + str(run) + '/'
+    os.mkdir(dataDir)
+    dataProcess.initCSV(dataDir + 'gen2key.csv')
     random.seed()
 
     # 设置种群数量
@@ -683,7 +690,7 @@ def main():
 
 
     pop, log = gpSimple(pop, toolbox, 0.8, 0.15, 51, stats=mstats,
-                                   halloffame=hof, verbose=True)
+                                   halloffame=hof, verbose=True, where=dataDir)
     # print log
     #print "--------------"
     #print hof.items[0]
@@ -696,5 +703,5 @@ def main():
     return pop, log, hof
 
 if __name__ == "__main__":
-    for run in range(1):
-        main()
+    for run in range(20):
+        main(run)
